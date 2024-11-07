@@ -17,7 +17,7 @@ import java.util.ResourceBundle;
 public class MenuController implements Initializable {
 
     @FXML
-    private Button btnExecutar;
+    private Button btnExecutar, btnEstoque, btnConferencia;
     @FXML
     private TextField txtCodBarra;
     @FXML
@@ -28,6 +28,8 @@ public class MenuController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         btnExecutar.setOnAction(event -> btnExecutarAction());
+        btnEstoque.setOnAction(event -> btnEstoqueAction());
+        btnConferencia.setOnAction(event -> btnConferenciaAction());
         teste = Integer.parseInt(txtCodBarra.getText());
         teste = Integer.parseInt(txtQuantidade.getText());
     }
@@ -44,4 +46,6 @@ public class MenuController implements Initializable {
             e.printStackTrace();
         }
     }
+    private void btnEstoqueAction() {}
+    private void btnConferenciaAction() {}
 }
