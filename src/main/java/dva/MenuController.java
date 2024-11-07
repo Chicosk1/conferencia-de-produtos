@@ -22,6 +22,7 @@ public class MenuController implements Initializable {
     private TextField txtCodBarra;
     @FXML
     private TextField txtQuantidade;
+    GridPane
 
     int teste;
 
