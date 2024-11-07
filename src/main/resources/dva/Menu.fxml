@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox alignment="CENTER" spacing="20.0" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="dva.MenuController">
+    <children>
+        <Pane layoutX="14.0" layoutY="14.0" prefHeight="372.0" prefWidth="546.0">
+            <children>
+                <Button fx:id="btnExecutar" layoutX="61.0" layoutY="270.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="69.0" text="Executar" />
+                <TextField fx:id="txtCodBarra" layoutX="21.0" layoutY="174.0" text="Código de Barras" />
+                <TextField fx:id="txtQuantidade" layoutX="21.0" layoutY="222.0" text="Quantidade" />
+            </children>
+        </Pane>
+    </children>
+</VBox>
