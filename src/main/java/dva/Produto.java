@@ -17,32 +17,16 @@ public class Produto {
         return codBarras;
     }
 
-    public void setCodBarras(String codBarras) {
-        this.codBarras = codBarras;
-    }
-
     public String getDescricao() {
         return nomeProduto;
-    }
-
-    public void setDescricao(String descricao) {
-        this.nomeProduto = descricao;
     }
 
     public double getSaldo() {
         return saldo;
     }
 
-    public void setSaldo(int saldo) {
-        this.saldo = saldo;
-    }
-
     public double getValor() {
         return valor;
-    }
-
-    public void setValor(double valor) {
-        this.valor = valor;
     }
 
     @Override
