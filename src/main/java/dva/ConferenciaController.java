@@ -27,18 +27,20 @@ public class ConferenciaController implements Initializable {
     private ListView<String> listaConferencia;
 
     private List<Produto> listaDeProdutos = new ArrayList<>();
-    private final Stage stage;
+    private Stage stage;
 
-    public ConferenciaController(Stage stage) {
+    // Construtor padrão
+    public ConferenciaController() {
+        listaDeProdutos.add(new Produto("123", "SAPATO", 20.99, 2));
+        listaDeProdutos.add(new Produto("234", "CHINELOS", 19.99, 3));
+        listaDeProdutos.add(new Produto("456", "BOTA", 5.00, 4));
+        listaDeProdutos.add(new Produto("567", "TENIS", 7.00, 7));
+        listaDeProdutos.add(new Produto("678", "MEIA", 3.99, 1));
+    }
 
+    // Método para definir o stage
+    public void setStage(Stage stage) {
         this.stage = stage;
-
-        listaDeProdutos.add(new Produto("123", "SAPATO",20.99, 2));
-        listaDeProdutos.add(new Produto("234", "CHINELOS",19.99, 3));
-        listaDeProdutos.add(new Produto("456", "BOTA",5.00, 4));
-        listaDeProdutos.add(new Produto("567", "TENIS",7.00, 7));
-        listaDeProdutos.add(new Produto("678", "MEIA",3.99, 1));
-
     }
 
     @Override
@@ -48,56 +50,40 @@ public class ConferenciaController implements Initializable {
     }
 
     public void adicionarItem() {
-
         String codBarrasConferencia = txtCodBarra.getText().trim();
         String quantidadeConferencia = txtQuantidade.getText().trim();
-
         boolean produtoEncontrado = false;
-
-        //Adição na Lista
 
         int quantidade = Integer.parseInt(quantidadeConferencia);
 
         for (Produto produto : listaDeProdutos) {
-
             if (produto.getCodBarras().equals(codBarrasConferencia)) {
-
                 String descricao = produto.getDescricao();
                 double valor = produto.getValor();
                 String item = "Código: " + codBarrasConferencia + ", Descrição: " + descricao + ", Valor: " + valor + ", Quantidade: " + quantidade;
-
                 listaConferencia.getItems().add(item);
                 produtoEncontrado = true;
                 break;
-
             }
         }
 
-        //Erros do Sistema
-
         Alert alert = new Alert(AlertType.ERROR);
-
         if (!produtoEncontrado) {
-
             alert.setTitle("Erro");
             alert.setHeaderText("Código de Barras Inválido");
             alert.setContentText("O código de barras " + codBarrasConferencia + " não foi encontrado no sistema.");
-
             alert.showAndWait();
         }
 
         if (quantidadeConferencia.isEmpty() || !quantidadeConferencia.matches("\\d+")) {
-
             alert.setTitle("Erro");
             alert.setHeaderText("Quantidade Inválida");
             alert.setContentText("A quantidade " + quantidadeConferencia + " não foi encontrado no sistema.");
-
             alert.showAndWait();
         }
 
         txtCodBarra.clear();
         txtQuantidade.clear();
-
     }
 
     @FXML
@@ -106,6 +92,7 @@ public class ConferenciaController implements Initializable {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("Estoque.fxml"));
             Scene estoqueScene = new Scene(loader.load());
 
+            // Configura o stage
             stage.setScene(estoqueScene);
             stage.setTitle("Estoque");
         } catch (IOException e) {
