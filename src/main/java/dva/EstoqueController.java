@@ -4,13 +4,17 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableListBase;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.stage.Stage;
 
 import javax.naming.spi.ResolveResult;
+import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -52,5 +56,26 @@ public class EstoqueController implements Initializable {
 
 
         tableView.setItems(initialData());
+    }
+
+    private Stage stage;
+
+    public EstoqueController(Stage stage) {
+
+        this.stage = stage;
+
+    }
+
+    @FXML
+    private void irParaConferencia() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("Conferencia.fxml"));
+            Scene conferenciaScene = new Scene(loader.load());
+
+            stage.setScene(conferenciaScene);
+            stage.setTitle("Conferência de Estoque");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
