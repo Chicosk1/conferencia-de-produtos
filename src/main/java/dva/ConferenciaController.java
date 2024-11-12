@@ -1,5 +1,6 @@
 package dva;
 
+import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -26,9 +27,19 @@ public class ConferenciaController implements Initializable {
     private ListView<String> listaConferencia;
 
     private List<Produto> listaDeProdutos = new ArrayList<>();
+
     private List<List<Produto>> contagens = new ArrayList<>();
     private List<Produto> primeiraContagem = null;
+    private List<Produto> segundaContagem = null;
+
     private Stage stage;
+    private Scene scene;
+    private Parent root;
+
+    public void setStage(Stage stage) {
+        this.stage = stage;
+    }
+
 
     public ConferenciaController() {
         listaDeProdutos.add(new Produto("123", "SAPATO", 20.99, 2));
@@ -66,7 +77,7 @@ public class ConferenciaController implements Initializable {
         String quantidadeConferencia = txtQuantidade.getText().trim();
 
         if (quantidadeConferencia.isEmpty() || !quantidadeConferencia.matches("\\d+")) {
-            mostrarAlerta("Erro", "Quantidade Inválida", "A quantidade informada não é válida.");
+            mostrarAlerta("Erro", "Quantidade Inválida", "A quantidade informada não é válida.", false);
             return;
         }
 
@@ -79,23 +90,17 @@ public class ConferenciaController implements Initializable {
                 double valor = produto.getValor();
                 String item = "Código: " + codBarrasConferencia + ", Descrição: " + descricao + ", Valor: " + valor + ", Quantidade: " + quantidade;
 
-                if (quantidade > produto.getSaldo()) {
+                if (quantidade != produto.getSaldo()) {
                     item += " (Saldo insuficiente)";
                 } else {
                     item += " (Saldo disponível)";
                 }
 
-                for (int i = 0; i < listaConferencia.getItems().size(); i++) {
-                    if (listaConferencia.getItems().get(i).contains("Código: " + codBarrasConferencia)) {
-                        listaConferencia.getItems().remove(i);
-                        break;
-                    }
-                }
-
+                listaConferencia.getItems().removeIf(i -> i.contains("Código: " + codBarrasConferencia));
                 listaConferencia.getItems().add(item);
 
                 Produto produtoConferido = new Produto(codBarrasConferencia, descricao, valor, quantidade);
-                contagens.add(List.of(produtoConferido));
+                contagens.add(new ArrayList<>(List.of(produtoConferido)));
 
                 produtoEncontrado = true;
                 break;
@@ -103,7 +108,7 @@ public class ConferenciaController implements Initializable {
         }
 
         if (!produtoEncontrado) {
-            mostrarAlerta("Erro", "Código de Barras Inválido", "O código de barras " + codBarrasConferencia + " não foi encontrado no sistema.");
+            mostrarAlerta("Erro", "Código de Barras Inválido", "O código de barras " + codBarrasConferencia + " não foi encontrado no sistema.", false);
         }
 
         if (todosProdutosConferidos()) {
@@ -137,54 +142,72 @@ public class ConferenciaController implements Initializable {
 
     public void finalizarInventario() {
         boolean inventarioConcluidoComSucesso = true;
+        primeiraContagem = new ArrayList<>();
+        segundaContagem = new ArrayList<>();
 
         for (Produto produto : listaDeProdutos) {
             double quantidadeRegistrada = produto.getSaldo();
+            boolean produtoConferidoNaPrimeira = false;
+            boolean produtoConferidoNaSegunda = false;
 
-            boolean produtoConferido = false;
             for (List<Produto> conferencias : contagens) {
                 for (Produto conferido : conferencias) {
                     if (conferido.getCodBarras().equals(produto.getCodBarras())) {
                         if (conferido.getSaldo() != quantidadeRegistrada) {
+                            primeiraContagem.add(conferido);
                             inventarioConcluidoComSucesso = false;
                         }
-                        produtoConferido = true;
+                        produtoConferidoNaPrimeira = true;
                         break;
                     }
                 }
-                if (produtoConferido) break;
+                if (produtoConferidoNaPrimeira) break;
             }
 
-            if (!produtoConferido) {
+            for (Produto produtoPrimeira : primeiraContagem) {
+                if (produtoPrimeira.getCodBarras().equals(produto.getCodBarras())) {
+                    if (produtoPrimeira.getSaldo() == quantidadeRegistrada) {
+                        segundaContagem.add(produtoPrimeira);
+                    } else if (segundaContagem.contains(produtoPrimeira)) {
+                        inventarioConcluidoComSucesso = false;
+                    }
+                    produtoConferidoNaSegunda = true;
+                    break;
+                }
+            }
+
+            if (!produtoConferidoNaPrimeira || !produtoConferidoNaSegunda) {
                 inventarioConcluidoComSucesso = false;
             }
         }
 
         if (inventarioConcluidoComSucesso) {
-            mostrarAlerta("Sucesso", "Inventário Concluído", "O inventário foi concluído com sucesso!");
+            mostrarAlerta("Sucesso", "Inventário Concluído", "O inventário foi concluído com sucesso!", true);
+        } else if (segundaContagem.equals(primeiraContagem)) {
+            mostrarAlerta("Divergência", "Inventário Concluído com Divergências", "A segunda contagem é idêntica à primeira, mas diferente do sistema.", false);
         } else {
-            mostrarAlerta("Erro", "Inventário Incompleto", "Alguns produtos possuem quantidade incorreta ou não foram conferidos.");
+            mostrarAlerta("Erro", "Inventário Incompleto", "Alguns produtos possuem quantidade incorreta ou não foram conferidos.", false);
+            listaConferencia.setItems(FXCollections.observableArrayList());
+            listaConferencia.refresh();
+            contagens = new ArrayList<>();
+            contagens.clear();
         }
     }
 
-    private void mostrarAlerta(String title, String header, String content) {
-        Alert alert = new Alert(AlertType.ERROR);
+    private void mostrarAlerta(String title, String header, String content, boolean sucesso) {
+        Alert alert;
+
+        if (sucesso) {
+            alert = new Alert(AlertType.CONFIRMATION);
+        } else {
+            alert = new Alert(AlertType.ERROR);
+        }
+
         alert.setTitle(title);
         alert.setHeaderText(header);
         alert.setContentText(content);
         alert.showAndWait();
     }
-
-    public void setStage(Stage stage) {
-        this.stage = stage;
-    }
-
-
-
-
-    private Scene scene;
-    private Parent root;
-
 
     @FXML
     public void irParaEstoque(javafx.event.ActionEvent event) throws IOException {
