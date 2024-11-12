@@ -2,11 +2,8 @@ module com.example.conferencia_de_produtos {
     requires javafx.controls;
     requires javafx.fxml;
     requires javafx.web;
-<<<<<<< HEAD
-    exports  dva;
-=======
+
     exports dva;
->>>>>>> acabc21fd6df23396d75919cb38f7f58bff1aa38
     opens dva to javafx.fxml;
 
     requires org.controlsfx.controls;

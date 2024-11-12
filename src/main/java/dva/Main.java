@@ -13,10 +13,9 @@ public class Main extends Application {
     public void start(Stage stage) throws IOException {
         try {
             Parent root = FXMLLoader.load(getClass().getResource("Conferencia.fxml"));
-            Scene scene = new Scene(root);
-
+            Scene scene2 = new Scene(root);
             stage.setTitle("Conferência de Estoque");
-            stage.setScene(scene);
+            stage.setScene(scene2);
             stage.show();
 
         } catch (IOException e) {
