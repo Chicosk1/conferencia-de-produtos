@@ -1,5 +1,8 @@
 package dva;
 
+import javafx.beans.binding.BooleanBinding;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -10,7 +13,9 @@ import javafx.stage.Stage;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert.AlertType;
-
+import javafx.scene.control.TextField;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.VBox;
 import java.net.URL;
 import java.util.List;
 import java.io.IOException;
@@ -217,7 +222,18 @@ public class ConferenciaController implements Initializable {
         stage.setScene(scene);
         stage.show();
     }
+    public void Troca (){
+        txtCodBarra.setOnKeyPressed(event -> {
+            if (event.getCode().toString().equals("ENTER")) {
+                txtQuantidade.requestFocus();
+            }
+        });
     }
-
-
-
+    public void Troca2 (){
+        txtQuantidade.setOnKeyPressed(event -> {
+            if (event.getCode().toString().equals("ENTER")) {
+                btnExecutar.requestFocus();
+            }
+        });
+    }
+}

@@ -63,7 +63,7 @@ public class EstoqueController extends ConferenciaController implements Initiali
     public void initialize(URL url, ResourceBundle resourceBundle) {
         // Configura as colunas da tabela
         colId.setCellValueFactory(new PropertyValueFactory<Produto, String>("codBarras"));
-        Product.setCellValueFactory(new PropertyValueFactory<Produto, String>("nomeProduto"));
+        Product.setCellValueFactory(new PropertyValueFactory<Produto, String>("Descricao"));
         Saldo.setCellValueFactory(new PropertyValueFactory<Produto, Integer>("saldo"));
         Cost.setCellValueFactory(new PropertyValueFactory<Produto, Integer>("valor"));
 

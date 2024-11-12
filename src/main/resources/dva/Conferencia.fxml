@@ -3,6 +3,8 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.VBox?>
 
 <VBox alignment="CENTER" spacing="20.0" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="dva.ConferenciaController">
     <children>
@@ -13,8 +15,8 @@
                 <!-- Botão de Conferência com ação associada -->
                 <Button fx:id="btnConferencia" layoutX="304.0" layoutY="96.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="149.0" text="Conferência" />
                 <!-- Campos de entrada com promptText -->
-                <TextField fx:id="txtCodBarra" layoutX="21.0" layoutY="174.0" promptText="Código de Barras" />
-                <TextField fx:id="txtQuantidade" layoutX="21.0" layoutY="222.0" promptText="Quantidade" />
+                <TextField fx:id="txtCodBarra" layoutX="21.0" layoutY="174.0" promptText="Código de Barras" onKeyPressed="#Troca"/>
+                <TextField fx:id="txtQuantidade" layoutX="21.0" layoutY="222.0" promptText="Quantidade" onKeyPressed="#Troca2"/>
                 <ListView fx:id="listaConferencia" layoutX="184.0" layoutY="147.0" prefHeight="200.0" prefWidth="343.0" />
                 <Label layoutX="93.0" layoutY="30.0" prefHeight="54.0" prefWidth="360.0" text="Sistema de Inventário" textAlignment="CENTER">
                     <font>
