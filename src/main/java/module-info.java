@@ -2,7 +2,11 @@ module com.example.conferencia_de_produtos {
     requires javafx.controls;
     requires javafx.fxml;
     requires javafx.web;
+<<<<<<< HEAD
     exports  dva;
+=======
+    exports dva;
+>>>>>>> acabc21fd6df23396d75919cb38f7f58bff1aa38
     opens dva to javafx.fxml;
 
     requires org.controlsfx.controls;
@@ -13,6 +17,7 @@ module com.example.conferencia_de_produtos {
     requires eu.hansolo.tilesfx;
     requires com.almasb.fxgl.all;
     requires java.desktop;
+    requires java.naming;
 
     opens com.example.conferencia_de_produtos to javafx.fxml;
     exports com.example.conferencia_de_produtos;
