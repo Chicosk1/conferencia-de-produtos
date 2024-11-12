@@ -2,22 +2,26 @@ package dva;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
+import java.io.IOException;
+
 public class Main extends Application {
-
     @Override
-    public void start(Stage primaryStage) throws Exception {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("Conferencia.fxml"));
-        Scene conferenciaScene = new Scene(loader.load());
+    public void start(Stage stage) throws IOException {
+        try {
+            Parent root = FXMLLoader.load(getClass().getResource("Conferencia.fxml"));
+            Scene scene = new Scene(root);
 
-        ConferenciaController conferenciaController = loader.getController();
-        conferenciaController.inicializar(primaryStage);
+            stage.setTitle("Conferência de Estoque");
+            stage.setScene(scene);
+            stage.show();
 
-        primaryStage.setScene(conferenciaScene);
-        primaryStage.setTitle("Tela de Conferência");
-        primaryStage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public static void main(String[] args) {

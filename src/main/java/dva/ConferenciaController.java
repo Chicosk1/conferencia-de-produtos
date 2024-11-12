@@ -2,13 +2,10 @@ package dva;
 
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
+import javafx.scene.control.*;
 import javafx.stage.Stage;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextField;
 import javafx.scene.control.Alert.AlertType;
 
 import java.net.URL;
@@ -29,7 +26,6 @@ public class ConferenciaController implements Initializable {
     private List<Produto> listaDeProdutos = new ArrayList<>();
     private Stage stage;
 
-    // Construtor padrão
     public ConferenciaController() {
         listaDeProdutos.add(new Produto("123", "SAPATO", 20.99, 2));
         listaDeProdutos.add(new Produto("234", "CHINELOS", 19.99, 3));
@@ -38,13 +34,25 @@ public class ConferenciaController implements Initializable {
         listaDeProdutos.add(new Produto("678", "MEIA", 3.99, 1));
     }
 
-    // Método para definir o stage
-    public void setStage(Stage stage) {
-        this.stage = stage;
-    }
-
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        listaConferencia.setCellFactory(param -> new ListCell<String>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (item != null) {
+                    if (item.contains("(Saldo insuficiente)")) {
+                        setStyle("-fx-text-fill: red;");
+                    } else if (item.contains("(Saldo disponível)")) {
+                        setStyle("-fx-text-fill: blue;");
+                    } else {
+                        setStyle("");
+                    }
+                    setText(item);
+                }
+            }
+        });
+
         btnExecutar.setOnAction(event -> adicionarItem());
         btnEstoque.setOnAction(event -> irParaEstoque());
     }
@@ -52,38 +60,55 @@ public class ConferenciaController implements Initializable {
     public void adicionarItem() {
         String codBarrasConferencia = txtCodBarra.getText().trim();
         String quantidadeConferencia = txtQuantidade.getText().trim();
-        boolean produtoEncontrado = false;
+
+        if (quantidadeConferencia.isEmpty() || !quantidadeConferencia.matches("\\d+")) {
+            showAlert("Erro", "Quantidade Inválida", "A quantidade informada não é válida.");
+            return;
+        }
 
         int quantidade = Integer.parseInt(quantidadeConferencia);
+        boolean produtoEncontrado = false;
 
         for (Produto produto : listaDeProdutos) {
             if (produto.getCodBarras().equals(codBarrasConferencia)) {
                 String descricao = produto.getDescricao();
                 double valor = produto.getValor();
-                String item = "Código: " + codBarrasConferencia + ", Descrição: " + descricao + ", Valor: " + valor + ", Quantidade: " + quantidade;
+                String item = "Código: " + codBarrasConferencia + ", Descrição: " + descricao +
+                        ", Valor: " + valor + ", Quantidade: " + quantidade;
+
+                if (quantidade > produto.getSaldo()) {
+                    item += " (Saldo insuficiente)";
+                } else {
+                    item += " (Saldo disponível)";
+                }
+
+                for (int i = 0; i < listaConferencia.getItems().size(); i++) {
+                    if (listaConferencia.getItems().get(i).contains("Código: " + codBarrasConferencia)) {
+                        listaConferencia.getItems().remove(i);
+                        break;
+                    }
+                }
+
                 listaConferencia.getItems().add(item);
                 produtoEncontrado = true;
                 break;
             }
         }
 
-        Alert alert = new Alert(AlertType.ERROR);
         if (!produtoEncontrado) {
-            alert.setTitle("Erro");
-            alert.setHeaderText("Código de Barras Inválido");
-            alert.setContentText("O código de barras " + codBarrasConferencia + " não foi encontrado no sistema.");
-            alert.showAndWait();
-        }
-
-        if (quantidadeConferencia.isEmpty() || !quantidadeConferencia.matches("\\d+")) {
-            alert.setTitle("Erro");
-            alert.setHeaderText("Quantidade Inválida");
-            alert.setContentText("A quantidade " + quantidadeConferencia + " não foi encontrado no sistema.");
-            alert.showAndWait();
+            showAlert("Erro", "Código de Barras Inválido", "O código de barras " + codBarrasConferencia + " não foi encontrado no sistema.");
         }
 
         txtCodBarra.clear();
         txtQuantidade.clear();
+    }
+
+    private void showAlert(String title, String header, String content) {
+        Alert alert = new Alert(AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setHeaderText(header);
+        alert.setContentText(content);
+        alert.showAndWait();
     }
 
     @FXML
@@ -92,7 +117,6 @@ public class ConferenciaController implements Initializable {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("Estoque.fxml"));
             Scene estoqueScene = new Scene(loader.load());
 
-            // Configura o stage
             stage.setScene(estoqueScene);
             stage.setTitle("Estoque");
         } catch (IOException e) {
