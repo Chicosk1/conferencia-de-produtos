@@ -1,6 +1,9 @@
 package dva;
 
 import javafx.fxml.FXML;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -10,35 +13,38 @@ import javafx.scene.control.Alert.AlertType;
 
 import java.net.URL;
 import java.util.List;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 
 public class ConferenciaController implements Initializable {
 
     @FXML
-    private Button btnExecutar, btnEstoque, btnConferencia;
+    private Button btnExecutar, btnEstoque;
     @FXML
     private TextField txtCodBarra, txtQuantidade;
     @FXML
     private ListView<String> listaConferencia;
 
     private List<Produto> listaDeProdutos = new ArrayList<>();
+    private final Stage stage;
 
-    public ConferenciaController() {
+    public ConferenciaController(Stage stage) {
 
-        listaDeProdutos.add(new Produto("123", "SAPATO", 2, 20.99));
-        listaDeProdutos.add(new Produto("234", "CHINELOS", 3, 19.99));
-        listaDeProdutos.add(new Produto("456", "BOTA", 4, 5.00));
-        listaDeProdutos.add(new Produto("567", "TENIS", 7, 7.00));
-        listaDeProdutos.add(new Produto("678", "MEIA", 1, 3.99));
+        this.stage = stage;
+
+        listaDeProdutos.add(new Produto("123", "SAPATO",20.99, 2));
+        listaDeProdutos.add(new Produto("234", "CHINELOS",19.99, 3));
+        listaDeProdutos.add(new Produto("456", "BOTA",5.00, 4));
+        listaDeProdutos.add(new Produto("567", "TENIS",7.00, 7));
+        listaDeProdutos.add(new Produto("678", "MEIA",3.99, 1));
 
     }
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         btnExecutar.setOnAction(event -> adicionarItem());
-        btnEstoque.setOnAction(event -> btnEstoqueAction());
-        btnConferencia.setOnAction(event -> btnConferenciaAction());
+        btnEstoque.setOnAction(event -> irParaEstoque());
     }
 
     public void adicionarItem() {
@@ -47,6 +53,25 @@ public class ConferenciaController implements Initializable {
         String quantidadeConferencia = txtQuantidade.getText().trim();
 
         boolean produtoEncontrado = false;
+
+        //Adição na Lista
+
+        int quantidade = Integer.parseInt(quantidadeConferencia);
+
+        for (Produto produto : listaDeProdutos) {
+
+            if (produto.getCodBarras().equals(codBarrasConferencia)) {
+
+                String descricao = produto.getDescricao();
+                double valor = produto.getValor();
+                String item = "Código: " + codBarrasConferencia + ", Descrição: " + descricao + ", Valor: " + valor + ", Quantidade: " + quantidade;
+
+                listaConferencia.getItems().add(item);
+                produtoEncontrado = true;
+                break;
+
+            }
+        }
 
         //Erros do Sistema
 
@@ -70,30 +95,21 @@ public class ConferenciaController implements Initializable {
             alert.showAndWait();
         }
 
-        //Adição na Lista
-
-        int quantidade = Integer.parseInt(quantidadeConferencia);
-
-        for (Produto produto : listaDeProdutos) {
-
-            if (produto.getCodBarras().equals(codBarrasConferencia)) {
-
-                String descricao = produto.getDescricao();
-                double valor = produto.getValor();
-                String item = "Código: " + codBarrasConferencia + ", Descrição: " + descricao + ", Valor: " + valor + ", Quantidade: " + quantidade;
-
-                listaConferencia.getItems().add(item);
-                produtoEncontrado = true;
-                break;
-
-            }
-        }
-
         txtCodBarra.clear();
         txtQuantidade.clear();
 
     }
 
-    private void btnEstoqueAction() {}
-    private void btnConferenciaAction() {}
+    @FXML
+    private void irParaEstoque() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("Estoque.fxml"));
+            Scene estoqueScene = new Scene(loader.load());
+
+            stage.setScene(estoqueScene);
+            stage.setTitle("Estoque");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }

@@ -1,16 +1,16 @@
 package dva;
 
 public class Produto {
-    private String codBarras;
-    private String nomeProduto;
-    private int saldo;
-    private double valor;
 
-    public Produto(String codBarras, String descricao, int saldo, double valor) {
+    private String codBarras, nomeProduto;
+    private double valor;
+    private int saldo;
+
+    public Produto(String codBarras, String descricao, double valor, int saldo) {
         this.codBarras = codBarras;
         this.nomeProduto = descricao;
-        this.saldo = saldo;
         this.valor = valor;
+        this.saldo = saldo;
     }
 
     public String getCodBarras() {
@@ -21,12 +21,12 @@ public class Produto {
         return nomeProduto;
     }
 
-    public double getSaldo() {
-        return saldo;
-    }
-
     public double getValor() {
         return valor;
+    }
+
+    public double getSaldo() {
+        return saldo;
     }
 
     @Override

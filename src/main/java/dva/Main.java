@@ -10,15 +10,14 @@ import java.io.IOException;
 
 public class Main extends Application {
     @Override
-    public void start(Stage primaryStage) throws IOException {
+    public void start(Stage stage) throws IOException {
         try {
-
             Parent root = FXMLLoader.load(getClass().getResource("Conferencia.fxml"));
             Scene scene = new Scene(root);
 
-            primaryStage.setTitle("Conferência de Estoque");
-            primaryStage.setScene(scene);
-            primaryStage.show();
+            stage.setTitle("Conferência de Estoque");
+            stage.setScene(scene);
+            stage.show();
 
         } catch (IOException e) {
             e.printStackTrace();

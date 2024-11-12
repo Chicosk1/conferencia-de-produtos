@@ -8,8 +8,8 @@
     <children>
         <Pane layoutX="14.0" layoutY="14.0" prefHeight="372.0" prefWidth="546.0">
             <children>
-                <Button fx:id="btnExecutar" layoutX="61.0" layoutY="270.0" mnemonicParsing="false" onAction="#adicionarItem" prefHeight="25.0" prefWidth="69.0" text="Executar" />
-                <Button fx:id="btnEstoque" layoutX="131.0" layoutY="96.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="149.0" text="Estoque" />
+                <Button fx:id="btnExecutar" layoutX="61.0" layoutY="270.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="69.0" text="Executar" onAction="#adicionarItem" />
+                <Button fx:id="btnEstoque" layoutX="131.0" layoutY="96.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="149.0" text="Estoque"  onAction="#irParaEstoque"/>
                 <Button fx:id="btnConferencia" layoutX="266.0" layoutY="96.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="149.0" text="Conferência" />
                 <TextField fx:id="txtCodBarra" layoutX="21.0" layoutY="174.0" text="Código de Barras" />
                 <TextField fx:id="txtQuantidade" layoutX="21.0" layoutY="222.0" text="Quantidade" />
@@ -19,14 +19,6 @@
                         <Font size="37.0" />
                     </font>
                 </Label>
-                    <TableView fx:id="tableView" layoutX="184.0" layoutY="147.0" prefHeight="200.0" prefWidth="343.0">
-                        <columns>
-                            <TableColumn fx:id="colId" prefWidth="50.0" text="Id" />
-                            <TableColumn fx:id="colProduto" prefWidth="96.39996337890625" text="Produto" />
-                            <TableColumn fx:id="colSaldo" prefWidth="88.4000244140625" text="Saldo" />
-                            <TableColumn fx:id="colCusto" prefWidth="81.4000244140625" text="Custo" />
-                        </columns>
-                    </TableView>
             </children>
         </Pane>
     </children>
