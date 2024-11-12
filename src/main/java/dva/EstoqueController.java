@@ -5,6 +5,7 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -18,7 +19,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class EstoqueController implements Initializable {
+public class EstoqueController extends ConferenciaController implements Initializable{
 
     @FXML
     private TableColumn<Produto, Integer> Saldo;
@@ -41,7 +42,6 @@ public class EstoqueController implements Initializable {
     @FXML
     private Button btnEstoque;
 
-    private Stage stage;
 
     // Construtor padrão
     public EstoqueController() {
@@ -50,10 +50,13 @@ public class EstoqueController implements Initializable {
 
     // Método para inicializar os dados na tabela
     ObservableList<Produto> initialData() {
-        Produto p1 = new Produto("123", "carro", 5, 100);
-        Produto p2 = new Produto("234", "carro2", 5, 1000);
+        Produto p1 = new Produto("123", "SAPATO", 20.99, 2);
+        Produto p2 = new Produto("234", "CHINELOS", 19.99, 3);
+        Produto p3 = new Produto("456", "BOTA", 5.00, 4);
+        Produto p4 = new Produto("567", "TENIS", 7.00, 7);
+        Produto p5 = new Produto("678", "MEIA", 3.99, 1);
 
-        return FXCollections.observableArrayList(p1, p2);
+        return FXCollections.observableArrayList(p1, p2, p3, p4, p5);
     }
 
     @Override
@@ -68,8 +71,16 @@ public class EstoqueController implements Initializable {
         tableView.setItems(initialData());
     }
 
-    // Método para configurar o Stage no controlador
-    public void setStage(Stage stage) {
-        this.stage = stage;
+    private Stage stage;
+    private Scene scene;
+    private Parent root;
+
+    @FXML
+    public void irParaConferencia(javafx.event.ActionEvent event) throws IOException {
+        Parent root = FXMLLoader.load(getClass().getResource("Conferencia.fxml"));
+        stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        scene = new Scene(root);
+        stage.setScene(scene);
+        stage.show();
     }
 }

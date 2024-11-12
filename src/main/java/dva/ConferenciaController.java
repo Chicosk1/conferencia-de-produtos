@@ -1,6 +1,7 @@
 package dva;
 
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -41,7 +42,6 @@ public class ConferenciaController implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
 
         btnExecutar.setOnAction(event -> adicionarItem());
-        btnEstoque.setOnAction(event -> irParaEstoque());
 
         listaConferencia.setCellFactory(param -> new ListCell<String>() {
             @Override
@@ -178,4 +178,23 @@ public class ConferenciaController implements Initializable {
     public void setStage(Stage stage) {
         this.stage = stage;
     }
-}
+
+
+
+
+    private Scene scene;
+    private Parent root;
+
+
+    @FXML
+    public void irParaEstoque(javafx.event.ActionEvent event) throws IOException {
+        Parent root = FXMLLoader.load(getClass().getResource("Estoque.fxml"));
+        stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        scene = new Scene(root);
+        stage.setScene(scene);
+        stage.show();
+    }
+    }
+
+
+

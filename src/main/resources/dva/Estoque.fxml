@@ -1,16 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<VBox alignment="CENTER" spacing="20.0" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml" fx:controller="dva.EstoqueController">
+<VBox alignment="CENTER" spacing="20.0" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="dva.EstoqueController">
     <children>
         <Pane layoutX="14.0" layoutY="14.0" prefHeight="372.0" prefWidth="546.0">
             <children>
-                <Button fx:id="btnEstoque" layoutX="131.0" layoutY="96.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="149.0" text="Estoque" />
-                <Button fx:id="btnConferencia" layoutX="266.0" layoutY="96.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="149.0" text="Conferência" onAction="#irParaConferencia" />
+                <Button fx:id="btnEstoque" layoutX="93.0" layoutY="96.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="149.0" text="Estoque" />
+                <Button fx:id="btnConferencia" layoutX="304.0" layoutY="96.0" mnemonicParsing="false" onAction="#irParaConferencia" prefHeight="25.0" prefWidth="149.0" text="Conferência" />
                 <TableView fx:id="tableView" layoutX="13.0" layoutY="160.0" prefHeight="180.0" prefWidth="519.0">
                     <columns>
                         <TableColumn fx:id="colId" prefWidth="66.40000915527344" text="Id" />
