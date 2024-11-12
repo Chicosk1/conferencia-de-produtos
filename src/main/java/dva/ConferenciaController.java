@@ -103,11 +103,11 @@ public class ConferenciaController implements Initializable {
     @FXML
     private void irParaEstoque() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("estoque.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("Estoque.fxml"));
             Scene estoqueScene = new Scene(loader.load());
 
             stage.setScene(estoqueScene);
-            stage.setTitle("Tela de Estoque");
+            stage.setTitle("Estoque");
         } catch (IOException e) {
             e.printStackTrace();
         }
