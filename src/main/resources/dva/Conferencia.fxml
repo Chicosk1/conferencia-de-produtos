@@ -9,10 +9,12 @@
         <Pane layoutX="14.0" layoutY="14.0" prefHeight="372.0" prefWidth="546.0">
             <children>
                 <Button fx:id="btnExecutar" layoutX="61.0" layoutY="270.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="69.0" text="Executar" onAction="#adicionarItem" />
-                <Button fx:id="btnEstoque" layoutX="131.0" layoutY="96.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="149.0" text="Estoque"  onAction="#irParaEstoque"/>
+                <Button fx:id="btnEstoque" layoutX="131.0" layoutY="96.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="149.0" text="Estoque" onAction="#irParaEstoque" />
+                <!-- Botão de Conferência com ação associada -->
                 <Button fx:id="btnConferencia" layoutX="266.0" layoutY="96.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="149.0" text="Conferência" />
-                <TextField fx:id="txtCodBarra" layoutX="21.0" layoutY="174.0" text="Código de Barras" />
-                <TextField fx:id="txtQuantidade" layoutX="21.0" layoutY="222.0" text="Quantidade" />
+                <!-- Campos de entrada com promptText -->
+                <TextField fx:id="txtCodBarra" layoutX="21.0" layoutY="174.0" promptText="Código de Barras" />
+                <TextField fx:id="txtQuantidade" layoutX="21.0" layoutY="222.0" promptText="Quantidade" />
                 <ListView fx:id="listaConferencia" layoutX="184.0" layoutY="147.0" prefHeight="200.0" prefWidth="343.0" />
                 <Label layoutX="93.0" layoutY="30.0" prefHeight="54.0" prefWidth="360.0" text="Sistema de Inventário" textAlignment="CENTER">
                     <font>

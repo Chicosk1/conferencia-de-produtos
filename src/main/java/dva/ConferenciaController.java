@@ -1,6 +1,7 @@
 package dva;
 
 import javafx.fxml.FXML;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
@@ -24,6 +25,8 @@ public class ConferenciaController implements Initializable {
     private ListView<String> listaConferencia;
 
     private List<Produto> listaDeProdutos = new ArrayList<>();
+    private List<List<Produto>> contagens = new ArrayList<>();
+    private List<Produto> primeiraContagem = null;
     private Stage stage;
 
     public ConferenciaController() {
@@ -36,6 +39,10 @@ public class ConferenciaController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+
+        btnExecutar.setOnAction(event -> adicionarItem());
+        btnEstoque.setOnAction(event -> irParaEstoque());
+
         listaConferencia.setCellFactory(param -> new ListCell<String>() {
             @Override
             protected void updateItem(String item, boolean empty) {
@@ -52,9 +59,6 @@ public class ConferenciaController implements Initializable {
                 }
             }
         });
-
-        btnExecutar.setOnAction(event -> adicionarItem());
-        btnEstoque.setOnAction(event -> irParaEstoque());
     }
 
     public void adicionarItem() {
@@ -62,7 +66,7 @@ public class ConferenciaController implements Initializable {
         String quantidadeConferencia = txtQuantidade.getText().trim();
 
         if (quantidadeConferencia.isEmpty() || !quantidadeConferencia.matches("\\d+")) {
-            showAlert("Erro", "Quantidade Inválida", "A quantidade informada não é válida.");
+            mostrarAlerta("Erro", "Quantidade Inválida", "A quantidade informada não é válida.");
             return;
         }
 
@@ -73,8 +77,7 @@ public class ConferenciaController implements Initializable {
             if (produto.getCodBarras().equals(codBarrasConferencia)) {
                 String descricao = produto.getDescricao();
                 double valor = produto.getValor();
-                String item = "Código: " + codBarrasConferencia + ", Descrição: " + descricao +
-                        ", Valor: " + valor + ", Quantidade: " + quantidade;
+                String item = "Código: " + codBarrasConferencia + ", Descrição: " + descricao + ", Valor: " + valor + ", Quantidade: " + quantidade;
 
                 if (quantidade > produto.getSaldo()) {
                     item += " (Saldo insuficiente)";
@@ -90,20 +93,81 @@ public class ConferenciaController implements Initializable {
                 }
 
                 listaConferencia.getItems().add(item);
+
+                Produto produtoConferido = new Produto(codBarrasConferencia, descricao, valor, quantidade);
+                contagens.add(List.of(produtoConferido));
+
                 produtoEncontrado = true;
                 break;
             }
         }
 
         if (!produtoEncontrado) {
-            showAlert("Erro", "Código de Barras Inválido", "O código de barras " + codBarrasConferencia + " não foi encontrado no sistema.");
+            mostrarAlerta("Erro", "Código de Barras Inválido", "O código de barras " + codBarrasConferencia + " não foi encontrado no sistema.");
+        }
+
+        if (todosProdutosConferidos()) {
+            finalizarInventario();
         }
 
         txtCodBarra.clear();
         txtQuantidade.clear();
     }
 
-    private void showAlert(String title, String header, String content) {
+    private boolean todosProdutosConferidos() {
+        for (Produto produto : listaDeProdutos) {
+            boolean produtoConferido = false;
+
+            for (List<Produto> conferencias : contagens) {
+                for (Produto conferido : conferencias) {
+                    if (conferido.getCodBarras().equals(produto.getCodBarras())) {
+                        produtoConferido = true;
+                        break;
+                    }
+                }
+                if (produtoConferido) break;
+            }
+
+            if (!produtoConferido) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public void finalizarInventario() {
+        boolean inventarioConcluidoComSucesso = true;
+
+        for (Produto produto : listaDeProdutos) {
+            double quantidadeRegistrada = produto.getSaldo();
+
+            boolean produtoConferido = false;
+            for (List<Produto> conferencias : contagens) {
+                for (Produto conferido : conferencias) {
+                    if (conferido.getCodBarras().equals(produto.getCodBarras())) {
+                        if (conferido.getSaldo() != quantidadeRegistrada) {
+                            inventarioConcluidoComSucesso = false;
+                        }
+                        produtoConferido = true;
+                        break;
+                    }
+                }
+                if (produtoConferido) break;
+            }
+
+            if (!produtoConferido) {
+                inventarioConcluidoComSucesso = false;
+            }
+        }
+
+        if (inventarioConcluidoComSucesso) {
+            mostrarAlerta("Sucesso", "Inventário Concluído", "O inventário foi concluído com sucesso!");
+        } else {
+            mostrarAlerta("Erro", "Inventário Incompleto", "Alguns produtos possuem quantidade incorreta ou não foram conferidos.");
+        }
+    }
+
+    private void mostrarAlerta(String title, String header, String content) {
         Alert alert = new Alert(AlertType.ERROR);
         alert.setTitle(title);
         alert.setHeaderText(header);
@@ -111,16 +175,7 @@ public class ConferenciaController implements Initializable {
         alert.showAndWait();
     }
 
-    @FXML
-    private void irParaEstoque() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("Estoque.fxml"));
-            Scene estoqueScene = new Scene(loader.load());
-
-            stage.setScene(estoqueScene);
-            stage.setTitle("Estoque");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public void setStage(Stage stage) {
+        this.stage = stage;
     }
 }

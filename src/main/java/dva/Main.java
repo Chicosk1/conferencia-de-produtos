@@ -12,10 +12,9 @@ public class Main extends Application {
     @Override
     public void start(Stage stage) throws IOException {
         try {
-            Parent root = FXMLLoader.load(getClass().getResource("Conferencia.fxml"));
+            // Corrigido: Acesso correto ao arquivo FXML
+            Parent root = FXMLLoader.load(getClass().getResource(("Conferencia.fxml")));
             Scene scene = new Scene(root);
-
-            stage.setTitle("Conferência de Estoque");
             stage.setScene(scene);
             stage.show();
 
