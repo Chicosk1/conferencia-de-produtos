@@ -33,8 +33,12 @@ public class ConferenciaController implements Initializable {
     private Scene scene;
 
     public ConferenciaController() {
-        listaDeProdutos.add(new Produto("123", "SAPATO", 20.99, 2));
-        listaDeProdutos.add(new Produto("234", "CHINELOS", 19.99, 3));
+        listaDeProdutos.add(new Produto("1", "SAPATO", 20.99, 2));
+        listaDeProdutos.add(new Produto("2", "CHINELOS", 19.99, 3));
+        listaDeProdutos.add(new Produto("3", "CHINELOS", 19.99, 3));
+        listaDeProdutos.add(new Produto("4", "CHINELOS", 19.99, 3));
+        listaDeProdutos.add(new Produto("5", "CHINELOS", 19.99, 3));
+
     }
 
     private List<Produto> listaParaConferir = listaDeProdutos;
