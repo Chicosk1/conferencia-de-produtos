@@ -73,7 +73,6 @@ public class EstoqueController extends ConferenciaController implements Initiali
 
     private Stage stage;
     private Scene scene;
-    private Parent root;
 
     @FXML
     public void irParaConferencia(javafx.event.ActionEvent event) throws IOException {

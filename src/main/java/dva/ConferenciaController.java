@@ -1,9 +1,5 @@
 package dva;
 
-import javafx.beans.binding.BooleanBinding;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -14,8 +10,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.TextField;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.VBox;
 import java.net.URL;
 import java.util.List;
 import java.io.IOException;
@@ -25,38 +19,28 @@ import java.util.ResourceBundle;
 public class ConferenciaController implements Initializable {
 
     @FXML
-    private Button btnExecutar, btnEstoque;
+    private Button btnExecutar;
     @FXML
     private TextField txtCodBarra, txtQuantidade;
     @FXML
     private ListView<String> listaConferencia;
 
     private List<Produto> listaDeProdutos = new ArrayList<>();
-
     private List<List<Produto>> contagens = new ArrayList<>();
-    private List<Produto> primeiraContagem = null;
-    private List<Produto> segundaContagem = null;
+    private List<Produto> primeiraContagem = new ArrayList<>();
 
     private Stage stage;
     private Scene scene;
-    private Parent root;
-
-    public void setStage(Stage stage) {
-        this.stage = stage;
-    }
-
 
     public ConferenciaController() {
         listaDeProdutos.add(new Produto("123", "SAPATO", 20.99, 2));
         listaDeProdutos.add(new Produto("234", "CHINELOS", 19.99, 3));
-        listaDeProdutos.add(new Produto("456", "BOTA", 5.00, 4));
-        listaDeProdutos.add(new Produto("567", "TENIS", 7.00, 7));
-        listaDeProdutos.add(new Produto("678", "MEIA", 3.99, 1));
     }
+
+    private List<Produto> listaParaConferir = listaDeProdutos;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-
         btnExecutar.setOnAction(event -> adicionarItem());
 
         listaConferencia.setCellFactory(param -> new ListCell<String>() {
@@ -72,6 +56,9 @@ public class ConferenciaController implements Initializable {
                         setStyle("");
                     }
                     setText(item);
+                } else {
+                    setText(null);
+                    setStyle("");
                 }
             }
         });
@@ -89,7 +76,7 @@ public class ConferenciaController implements Initializable {
         int quantidade = Integer.parseInt(quantidadeConferencia);
         boolean produtoEncontrado = false;
 
-        for (Produto produto : listaDeProdutos) {
+        for (Produto produto : listaParaConferir) {
             if (produto.getCodBarras().equals(codBarrasConferencia)) {
                 String descricao = produto.getDescricao();
                 double valor = produto.getValor();
@@ -125,7 +112,7 @@ public class ConferenciaController implements Initializable {
     }
 
     private boolean todosProdutosConferidos() {
-        for (Produto produto : listaDeProdutos) {
+        for (Produto produto : listaParaConferir) {
             boolean produtoConferido = false;
 
             for (List<Produto> conferencias : contagens) {
@@ -144,16 +131,13 @@ public class ConferenciaController implements Initializable {
         }
         return true;
     }
+
     public void finalizarInventario() {
         boolean inventarioConcluidoComSucesso = true;
-        
-        primeiraContagem = new ArrayList<>();
-        segundaContagem = new ArrayList<>();
 
-        for (Produto produto : listaDeProdutos) {
+        for (Produto produto : listaParaConferir) {
             double quantidadeRegistrada = produto.getSaldo();
             boolean produtoConferidoNaPrimeira = false;
-            boolean produtoConferidoNaSegunda = false;
 
             for (List<Produto> conferencias : contagens) {
                 for (Produto conferido : conferencias) {
@@ -169,49 +153,26 @@ public class ConferenciaController implements Initializable {
                 if (produtoConferidoNaPrimeira) break;
             }
 
-            for (Produto produtoPrimeira : primeiraContagem) {
-                if (produtoPrimeira.getCodBarras().equals(produto.getCodBarras())) {
-                    if (produtoPrimeira.getSaldo() == quantidadeRegistrada) {
-                        segundaContagem.add(produtoPrimeira);
-                    } else if (segundaContagem.contains(produtoPrimeira)) {
-                        inventarioConcluidoComSucesso = false;
-                    }
-                    produtoConferidoNaSegunda = true;
-                    break;
-                }
-            }
-
-            if (!produtoConferidoNaPrimeira || !produtoConferidoNaSegunda) {
+            if (!produtoConferidoNaPrimeira) {
                 inventarioConcluidoComSucesso = false;
             }
         }
+
         if (inventarioConcluidoComSucesso) {
             mostrarAlerta("Sucesso", "Inventário Concluído", "O inventário foi concluído com sucesso!", true);
-        } else if (segundaContagem.equals(primeiraContagem)) {
-            mostrarAlerta("Divergência", "Inventário Concluído com Divergências", "A segunda contagem é idêntica à primeira, mas diferente do sistema.", false);
-
-            // Limpa a ListView visualmente e insere os produtos novamente
-            listaConferencia.getItems().clear();  // Limpa a lista visual
-            contagens.clear();  // Limpa as contagens para tentar novamente
         } else {
             mostrarAlerta("Erro", "Inventário Incompleto", "Alguns produtos possuem quantidade incorreta ou não foram conferidos.", false);
-
-            // Limpa a ListView visualmente e insere os produtos novamente
-            listaConferencia.getItems().clear();  // Limpa a lista visual
-            contagens.clear();  // Limpa as contagens para tentar novamente
         }
+
+        listaConferencia.getItems().clear();
+        contagens.clear();
+        primeiraContagem.clear();
+        listaParaConferir = new ArrayList<>(listaDeProdutos);
+        listaConferencia.refresh();
     }
 
-
     private void mostrarAlerta(String title, String header, String content, boolean sucesso) {
-        Alert alert;
-
-        if (sucesso) {
-            alert = new Alert(AlertType.CONFIRMATION);
-        } else {
-            alert = new Alert(AlertType.ERROR);
-        }
-
+        Alert alert = sucesso ? new Alert(AlertType.CONFIRMATION) : new Alert(AlertType.ERROR);
         alert.setTitle(title);
         alert.setHeaderText(header);
         alert.setContentText(content);
@@ -226,14 +187,16 @@ public class ConferenciaController implements Initializable {
         stage.setScene(scene);
         stage.show();
     }
-    public void Troca (){
+
+    public void Troca() {
         txtCodBarra.setOnKeyPressed(event -> {
             if (event.getCode().toString().equals("ENTER")) {
                 txtQuantidade.requestFocus();
             }
         });
     }
-    public void Troca2 (){
+
+    public void Troca2() {
         txtQuantidade.setOnKeyPressed(event -> {
             if (event.getCode().toString().equals("ENTER")) {
                 btnExecutar.requestFocus();
