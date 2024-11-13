@@ -26,22 +26,22 @@ public class ConferenciaController implements Initializable {
     private ListView<String> listaConferencia;
 
     private List<Produto> listaDeProdutos = new ArrayList<>();
-    private List<List<Produto>> contagens = new ArrayList<>();
-    private List<Produto> primeiraContagem = new ArrayList<>();
-
-    private Stage stage;
-    private Scene scene;
 
     public ConferenciaController() {
-        listaDeProdutos.add(new Produto("1", "SAPATO", 20.99, 2));
-        listaDeProdutos.add(new Produto("2", "CHINELOS", 19.99, 3));
+
+        listaDeProdutos.add(new Produto("1", "SAPATO", 20.99, 1));
+        listaDeProdutos.add(new Produto("2", "CHINELOS", 19.99, 2));
         listaDeProdutos.add(new Produto("3", "CHINELOS", 19.99, 3));
-        listaDeProdutos.add(new Produto("4", "CHINELOS", 19.99, 3));
-        listaDeProdutos.add(new Produto("5", "CHINELOS", 19.99, 3));
+        listaDeProdutos.add(new Produto("4", "CHINELOS", 19.99, 4));
+        listaDeProdutos.add(new Produto("5", "CHINELOS", 19.99, 5));
 
     }
 
     private List<Produto> listaParaConferir = listaDeProdutos;
+
+    private List<List<Produto>> contagens = new ArrayList<>();
+    private List<Produto> primeiraContagem = new ArrayList<>();
+    private List<Produto> segundaContagem = new ArrayList<>();
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -96,8 +96,14 @@ public class ConferenciaController implements Initializable {
                 listaConferencia.getItems().add(item);
 
                 Produto produtoConferido = new Produto(codBarrasConferencia, descricao, valor, quantidade);
-                contagens.add(new ArrayList<>(List.of(produtoConferido)));
 
+                if (primeiraContagem.stream().noneMatch(p -> p.getCodBarras().equals(codBarrasConferencia))) {
+                    primeiraContagem.add(produtoConferido); // Adiciona o produto na primeira contagem
+                } else if (segundaContagem.stream().noneMatch(p -> p.getCodBarras().equals(codBarrasConferencia))) {
+                    segundaContagem.add(produtoConferido); // Adiciona o produto na segunda contagem
+                }
+
+                contagens.add(new ArrayList<>(List.of(produtoConferido)));
                 produtoEncontrado = true;
                 break;
             }
@@ -165,13 +171,11 @@ public class ConferenciaController implements Initializable {
         if (inventarioConcluidoComSucesso) {
             mostrarAlerta("Sucesso", "Inventário Concluído", "O inventário foi concluído com sucesso!", true);
         } else {
-            mostrarAlerta("Erro", "Inventário Incompleto", "Alguns produtos possuem quantidade incorreta ou não foram conferidos.", false);
+            mostrarAlerta("Erro", "Inventário Incompleto", "Alguns produtos possuem quantidade incorreta ou não foram conferidos. Faça uma nova contagem.", false);
         }
-
         listaConferencia.getItems().clear();
-        contagens.clear();
-        primeiraContagem.clear();
         listaParaConferir = new ArrayList<>(listaDeProdutos);
+        contagens.clear();
         listaConferencia.refresh();
     }
 
@@ -182,6 +186,9 @@ public class ConferenciaController implements Initializable {
         alert.setContentText(content);
         alert.showAndWait();
     }
+
+    private Stage stage;
+    private Scene scene;
 
     @FXML
     public void irParaEstoque(javafx.event.ActionEvent event) throws IOException {
