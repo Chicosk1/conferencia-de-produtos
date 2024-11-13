@@ -12,7 +12,6 @@ public class Main extends Application {
     @Override
     public void start(Stage stage) throws IOException {
         try {
-            // Corrigido: Acesso correto ao arquivo FXML
             Parent root = FXMLLoader.load(getClass().getResource(("Conferencia.fxml")));
             Scene scene = new Scene(root);
             stage.setScene(scene);
