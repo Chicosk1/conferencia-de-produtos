@@ -144,9 +144,9 @@ public class ConferenciaController implements Initializable {
         }
         return true;
     }
-
     public void finalizarInventario() {
         boolean inventarioConcluidoComSucesso = true;
+        
         primeiraContagem = new ArrayList<>();
         segundaContagem = new ArrayList<>();
 
@@ -185,19 +185,23 @@ public class ConferenciaController implements Initializable {
                 inventarioConcluidoComSucesso = false;
             }
         }
-
         if (inventarioConcluidoComSucesso) {
             mostrarAlerta("Sucesso", "Inventário Concluído", "O inventário foi concluído com sucesso!", true);
         } else if (segundaContagem.equals(primeiraContagem)) {
             mostrarAlerta("Divergência", "Inventário Concluído com Divergências", "A segunda contagem é idêntica à primeira, mas diferente do sistema.", false);
+
+            // Limpa a ListView visualmente e insere os produtos novamente
+            listaConferencia.getItems().clear();  // Limpa a lista visual
+            contagens.clear();  // Limpa as contagens para tentar novamente
         } else {
             mostrarAlerta("Erro", "Inventário Incompleto", "Alguns produtos possuem quantidade incorreta ou não foram conferidos.", false);
-            listaConferencia.setItems(FXCollections.observableArrayList());
-            listaConferencia.refresh();
-            contagens = new ArrayList<>();
-            contagens.clear();
+
+            // Limpa a ListView visualmente e insere os produtos novamente
+            listaConferencia.getItems().clear();  // Limpa a lista visual
+            contagens.clear();  // Limpa as contagens para tentar novamente
         }
     }
+
 
     private void mostrarAlerta(String title, String header, String content, boolean sucesso) {
         Alert alert;
