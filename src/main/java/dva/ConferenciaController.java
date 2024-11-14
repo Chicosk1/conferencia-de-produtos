@@ -42,6 +42,7 @@ public class ConferenciaController implements Initializable {
     private List<List<Produto>> contagens = new ArrayList<>();
     private List<Produto> primeiraContagem = new ArrayList<>();
     private List<Produto> segundaContagem = new ArrayList<>();
+    private List<Produto> terceiraContagem = new ArrayList<>();
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -101,6 +102,8 @@ public class ConferenciaController implements Initializable {
                     primeiraContagem.add(produtoConferido); // Adiciona o produto na primeira contagem
                 } else if (segundaContagem.stream().noneMatch(p -> p.getCodBarras().equals(codBarrasConferencia))) {
                     segundaContagem.add(produtoConferido); // Adiciona o produto na segunda contagem
+                }else if (terceiraContagem.stream().noneMatch(p -> p.getCodBarras().equals(codBarrasConferencia))) {
+                    terceiraContagem.add(produtoConferido);
                 }
 
                 contagens.add(new ArrayList<>(List.of(produtoConferido)));
@@ -149,6 +152,8 @@ public class ConferenciaController implements Initializable {
             double quantidadeRegistrada = produto.getSaldo();
             boolean produtoConferidoNaPrimeira = false;
 
+
+
             for (List<Produto> conferencias : contagens) {
                 for (Produto conferido : conferencias) {
                     if (conferido.getCodBarras().equals(produto.getCodBarras())) {
@@ -168,6 +173,7 @@ public class ConferenciaController implements Initializable {
             }
         }
 
+
         if (inventarioConcluidoComSucesso) {
             mostrarAlerta("Sucesso", "Inventário Concluído", "O inventário foi concluído com sucesso!", true);
         } else {
@@ -177,10 +183,50 @@ public class ConferenciaController implements Initializable {
         listaParaConferir = new ArrayList<>(listaDeProdutos);
         contagens.clear();
         listaConferencia.refresh();
+
+        if (primeiraContagem == listaParaConferir){
+            mostrarAlerta("Divergencia", "Divergencia no Inv", "Houve uma divergencia no inventario", false);
+        }else{
+            mostrarAlerta("Divergencia", "Divergencia no Inv", "Erro no Inv", false);
+        }
+
+        if (segundaContagem == listaParaConferir){
+            mostrarAlerta("Divergencia", "Divergencia no Inv", "Houve uma divergencia no inventario", false);
+        }else {
+            mostrarAlerta("Divergencia", "Divergencia no Inv", "Erro no Inv", false);
+            if (segundaContagem == primeiraContagem){
+                mostrarAlerta("Divergencia", "Divergencia no Inv", "Houve uma divergencia no inventario", false);
+            }else{
+                mostrarAlerta("Divergencia", "Divergencia no Inv", "Erro no Inv", false);
+            }
+        }
+
+        if (terceiraContagem == listaParaConferir){
+            mostrarAlerta("Divergencia", "Divergencia no Inv", "Houve uma divergencia no inventario", false);
+
+        }else{
+            mostrarAlerta("Divergencia", "Divergencia no Inv", "Erro no Inv", false);
+            if(terceiraContagem == primeiraContagem){
+                mostrarAlerta("Divergencia", "Divergencia no Inv", "Houve uma divergencia no inventario", false);
+
+            }else{
+                mostrarAlerta("Divergencia", "Divergencia no Inv", "Erro no Inv", false);
+                if(terceiraContagem == segundaContagem) {
+                    mostrarAlerta("Divergencia", "Divergencia no Inv", "Houve uma divergencia no inventario", false);
+
+                }else {
+                    mostrarAlerta("Divergencia", "Divergencia no Inv", "Erro no Inv", false);
+
+                }
+            }
+        }
+
+
+
     }
 
     private void mostrarAlerta(String title, String header, String content, boolean sucesso) {
-        Alert alert = sucesso ? new Alert(AlertType.CONFIRMATION) : new Alert(AlertType.ERROR);
+        Alert alert = sucesso ? new Alert(AlertType.CONFIRMATION) : new Alert(AlertType.WARNING);
         alert.setTitle(title);
         alert.setHeaderText(header);
         alert.setContentText(content);
@@ -211,6 +257,14 @@ public class ConferenciaController implements Initializable {
         txtQuantidade.setOnKeyPressed(event -> {
             if (event.getCode().toString().equals("ENTER")) {
                 btnExecutar.requestFocus();
+            }
+        });
+    }
+
+    public void Troca3(){
+        btnExecutar.setOnKeyPressed(event -> {
+            if (event.getCode().toString().equals("ENTER")) {
+                txtCodBarra.requestFocus();
             }
         });
     }
