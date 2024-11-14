@@ -27,6 +27,9 @@ public class ConferenciaController implements Initializable {
 
     private List<Produto> listaDeProdutos = new ArrayList<>();
 
+    private int numeroDeContagens = 0; // Contador para rastrear quantas contagens foram realizadas
+
+
     public ConferenciaController() {
 
         listaDeProdutos.add(new Produto("1", "SAPATO", 20.99, 1));
@@ -99,11 +102,14 @@ public class ConferenciaController implements Initializable {
                 Produto produtoConferido = new Produto(codBarrasConferencia, descricao, valor, quantidade);
 
                 if (primeiraContagem.stream().noneMatch(p -> p.getCodBarras().equals(codBarrasConferencia))) {
-                    primeiraContagem.add(produtoConferido); // Adiciona o produto na primeira contagem
+                    primeiraContagem.add(produtoConferido);
+                    numeroDeContagens = 1; // Atualiza para indicar que a primeira contagem foi realizada
                 } else if (segundaContagem.stream().noneMatch(p -> p.getCodBarras().equals(codBarrasConferencia))) {
-                    segundaContagem.add(produtoConferido); // Adiciona o produto na segunda contagem
-                }else if (terceiraContagem.stream().noneMatch(p -> p.getCodBarras().equals(codBarrasConferencia))) {
+                    segundaContagem.add(produtoConferido);
+                    numeroDeContagens = 2; // Atualiza para indicar que a segunda contagem foi realizada
+                } else if (terceiraContagem.stream().noneMatch(p -> p.getCodBarras().equals(codBarrasConferencia))) {
                     terceiraContagem.add(produtoConferido);
+                    numeroDeContagens = 3; // Atualiza para indicar que a terceira contagem foi realizada
                 }
 
                 contagens.add(new ArrayList<>(List.of(produtoConferido)));
@@ -183,46 +189,28 @@ public class ConferenciaController implements Initializable {
         listaParaConferir = new ArrayList<>(listaDeProdutos);
         contagens.clear();
         listaConferencia.refresh();
-
-        if (primeiraContagem == listaParaConferir){
-            mostrarAlerta("Divergencia", "Divergencia no Inv", "Houve uma divergencia no inventario", false);
-        }else{
-            mostrarAlerta("Divergencia", "Divergencia no Inv", "Erro no Inv", false);
-        }
-
-        if (segundaContagem == listaParaConferir){
-            mostrarAlerta("Divergencia", "Divergencia no Inv", "Houve uma divergencia no inventario", false);
-        }else {
-            mostrarAlerta("Divergencia", "Divergencia no Inv", "Erro no Inv", false);
-            if (segundaContagem == primeiraContagem){
-                mostrarAlerta("Divergencia", "Divergencia no Inv", "Houve uma divergencia no inventario", false);
-            }else{
-                mostrarAlerta("Divergencia", "Divergencia no Inv", "Erro no Inv", false);
+        if (!inventarioConcluidoComSucesso){
+            if (numeroDeContagens == 1) {
+                verificarDivergencias(primeiraContagem, "Divergencia");
+            }
+            if (numeroDeContagens == 2) {
+                verificarDivergencias(segundaContagem, "Divergencia");
+            }
+            if (numeroDeContagens == 3) {
+                verificarDivergencias(terceiraContagem, "Divergencia");
             }
         }
 
-        if (terceiraContagem == listaParaConferir){
-            mostrarAlerta("Divergencia", "Divergencia no Inv", "Houve uma divergencia no inventario", false);
+    }
 
-        }else{
-            mostrarAlerta("Divergencia", "Divergencia no Inv", "Erro no Inv", false);
-            if(terceiraContagem == primeiraContagem){
-                mostrarAlerta("Divergencia", "Divergencia no Inv", "Houve uma divergencia no inventario", false);
-
-            }else{
-                mostrarAlerta("Divergencia", "Divergencia no Inv", "Erro no Inv", false);
-                if(terceiraContagem == segundaContagem) {
-                    mostrarAlerta("Divergencia", "Divergencia no Inv", "Houve uma divergencia no inventario", false);
-
-                }else {
-                    mostrarAlerta("Divergencia", "Divergencia no Inv", "Erro no Inv", false);
-
-                }
-            }
+    private void verificarDivergencias(List<Produto> contagem, String tipo) {
+        if (contagem.equals(listaParaConferir)) {
+            mostrarAlerta(tipo, tipo + " no Inv", "Houve uma divergencia no inventario", false);
+        } else if (contagem.equals(primeiraContagem) || contagem.equals(segundaContagem)) {
+            mostrarAlerta(tipo, tipo + " no Inv", "Houve uma divergencia no inventario", false);
+        } else {
+            mostrarAlerta(tipo, tipo + " no Inv", "Erro no Inv", false);
         }
-
-
-
     }
 
     private void mostrarAlerta(String title, String header, String content, boolean sucesso) {
