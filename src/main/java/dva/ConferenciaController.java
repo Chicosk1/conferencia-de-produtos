@@ -152,18 +152,18 @@ public class ConferenciaController implements Initializable {
 
     public void finalizarInventario() {
         boolean inventarioConcluidoComSucesso = true;
+        List<Produto> produtosDivergentes = new ArrayList<>(); // Lista para produtos em divergência
 
         for (Produto produto : listaParaConferir) {
             double quantidadeRegistrada = produto.getSaldo();
             boolean produtoConferidoNaPrimeira = false;
-
-
 
             for (List<Produto> conferencias : contagens) {
                 for (Produto conferido : conferencias) {
                     if (conferido.getCodBarras().equals(produto.getCodBarras())) {
                         if (conferido.getSaldo() != quantidadeRegistrada) {
                             primeiraContagem.add(conferido);
+                            produtosDivergentes.add(conferido); // Adiciona produto divergente à lista
                             inventarioConcluidoComSucesso = false;
                         }
                         produtoConferidoNaPrimeira = true;
@@ -175,15 +175,48 @@ public class ConferenciaController implements Initializable {
 
             if (!produtoConferidoNaPrimeira) {
                 inventarioConcluidoComSucesso = false;
+                produtosDivergentes.add(produto); // Adiciona produto não conferido à lista
             }
         }
-
 
         if (inventarioConcluidoComSucesso) {
             mostrarAlerta("Sucesso", "Inventário Concluído", "O inventário foi concluído com sucesso!", true);
         } else {
-            mostrarAlerta("Erro", "Inventário Incompleto", "Alguns produtos possuem quantidade incorreta ou não foram conferidos. Iniciando Proxima conferencia ", false);
+            if (numeroDeContagens < 3) {
+                // Mensagem de erro padrão nas duas primeiras tentativas
+                mostrarAlerta("Erro", "Inventário Incompleto", "Alguns produtos possuem quantidade incorreta ou não foram conferidos. Faça uma nova contagem.", false);
+            } else {
+                // Na terceira tentativa, exibe a lista dos produtos divergentes e encerra o inventário
+                StringBuilder mensagemErro = new StringBuilder("Os seguintes produtos possuem divergências:\n");
+
+                for (Produto produto : produtosDivergentes) {
+                    mensagemErro.append("- ").append(produto.getDescricao()).append("\n");
+                }
+
+                mostrarAlerta("Erro", "Inventário Finalizado com Divergências", mensagemErro.toString(), false);
+                System.exit(0);
+            }
         }
+
+        listaConferencia.getItems().clear();
+        listaParaConferir = new ArrayList<>(listaDeProdutos);
+        contagens.clear();
+        listaConferencia.refresh();
+
+        if (!inventarioConcluidoComSucesso) {
+            if (numeroDeContagens == 1) {
+                verificarDivergencias(primeiraContagem, "Divergencia");
+            }
+            if (numeroDeContagens == 2) {
+                verificarDivergencias(segundaContagem, "Divergencia");
+            }
+            if (numeroDeContagens == 3) {
+                verificarDivergencias(terceiraContagem, "Divergencia");
+            }
+        }
+
+
+
         listaConferencia.getItems().clear();
         listaParaConferir = new ArrayList<>(listaDeProdutos);
         contagens.clear();
@@ -217,16 +250,17 @@ public class ConferenciaController implements Initializable {
         } else if (numeroDeContagens == 1) {
             if (segundaContagem != listaParaConferir) {
                 if (segundaContagem == primeiraContagem) {
-                    mostrarAlerta("Erro", "Divergencia", "Segunda Contagem Exatamente Igual a primeira... Encerrando com Divergencias 2contagem", false);
+                    mostrarAlerta("Erro", "Divergencia", "Segunda Contagem Exatamente Igual a primeira... Encerrando com Divergencias.", false);
                     mostrarAlerta("Erro", "Inventário Finalizado com Divergências", mensagemErro.toString(), false);
                     System.exit(0);
+                }else{
+                    mostrarAlerta("Erro", "Inventário Incompleto", "Alguns produtos possuem quantidade incorreta ou não foram conferidos. Iniciando Proxima conferencia (2)", false);
                 }
-                mostrarAlerta("Erro", "Inventário Incompleto", "Alguns produtos possuem quantidade incorreta ou não foram conferidos. Iniciando Proxima conferencia 2  errada ", false);
             }else{
                 mostrarAlerta("Sucesso", "Inventário Concluído", "O inventário foi concluído com sucesso!", true);
                 System.exit(0);
-            }
-            if (segundaContagem != listaParaConferir && segundaContagem != primeiraContagem && numeroDeContagens == 2) {
+            }if (numeroDeContagens == 2){
+                if (segundaContagem != listaParaConferir && segundaContagem != primeiraContagem) {
                     if (terceiraContagem == listaParaConferir) {
                         mostrarAlerta("Sucesso", "Inventário Concluído", "O inventário foi concluído com sucesso!", true);
                         System.exit(0);
@@ -234,7 +268,9 @@ public class ConferenciaController implements Initializable {
                         mostrarAlerta("Erro", "Inventário Finalizado com Divergências", mensagemErro.toString(), false);
                         System.exit(0);
                     }
+                }
             }
+
         }
     }
 
