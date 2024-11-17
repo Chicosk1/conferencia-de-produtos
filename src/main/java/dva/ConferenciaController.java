@@ -152,7 +152,7 @@ public class ConferenciaController implements Initializable {
 
     public void finalizarInventario() {
         boolean inventarioConcluidoComSucesso = true;
-        List<Produto> produtosDivergentes = new ArrayList<>(); // Lista para produtos em divergência
+        List<Produto> produtosDivergentes = new ArrayList<>();
 
         for (Produto produto : listaParaConferir) {
             double quantidadeRegistrada = produto.getSaldo();
@@ -163,7 +163,7 @@ public class ConferenciaController implements Initializable {
                     if (conferido.getCodBarras().equals(produto.getCodBarras())) {
                         if (conferido.getSaldo() != quantidadeRegistrada) {
                             primeiraContagem.add(conferido);
-                            produtosDivergentes.add(conferido); // Adiciona produto divergente à lista
+                            produtosDivergentes.add(conferido);
                             inventarioConcluidoComSucesso = false;
                         }
                         produtoConferidoNaPrimeira = true;
@@ -175,7 +175,7 @@ public class ConferenciaController implements Initializable {
 
             if (!produtoConferidoNaPrimeira) {
                 inventarioConcluidoComSucesso = false;
-                produtosDivergentes.add(produto); // Adiciona produto não conferido à lista
+                produtosDivergentes.add(produto);
             }
         }
 
@@ -183,14 +183,15 @@ public class ConferenciaController implements Initializable {
             mostrarAlerta("Sucesso", "Inventário Concluído", "O inventário foi concluído com sucesso!", true);
         } else {
             if (numeroDeContagens < 3) {
-                // Mensagem de erro padrão nas duas primeiras tentativas
                 mostrarAlerta("Erro", "Inventário Incompleto", "Alguns produtos possuem quantidade incorreta ou não foram conferidos. Faça uma nova contagem.", false);
             } else {
-                // Na terceira tentativa, exibe a lista dos produtos divergentes e encerra o inventário
                 StringBuilder mensagemErro = new StringBuilder("Os seguintes produtos possuem divergências:\n");
 
                 for (Produto produto : produtosDivergentes) {
-                    mensagemErro.append("- ").append(produto.getDescricao()).append("\n");
+                    mensagemErro.append(produto.getCodBarras())
+                            .append(" - ")
+                            .append(produto.getDescricao())
+                            .append("\n");
                 }
 
                 mostrarAlerta("Erro", "Inventário Finalizado com Divergências", mensagemErro.toString(), false);
@@ -205,25 +206,28 @@ public class ConferenciaController implements Initializable {
 
         if (!inventarioConcluidoComSucesso) {
             if (numeroDeContagens == 1) {
-                verificarDivergencias(primeiraContagem, "Divergencia");
+                verificarDivergencias(primeiraContagem);
             }
             if (numeroDeContagens == 2) {
-                verificarDivergencias(segundaContagem, "Divergencia");
+                verificarDivergencias(segundaContagem);
             }
             if (numeroDeContagens == 3) {
-                verificarDivergencias(terceiraContagem, "Divergencia");
+                verificarDivergencias(terceiraContagem);
             }
         }
 
     }
 
-    private void verificarDivergencias(List<Produto> contagem, String tipo) {
+    private void verificarDivergencias(List<Produto> contagem) {
         List<Produto> produtosDivergentes = new ArrayList<>();
 
         StringBuilder mensagemErro = new StringBuilder("Os seguintes produtos possuem divergências:\n");
 
         for (Produto produto : produtosDivergentes) {
-            mensagemErro.append("- ").append(produto.getDescricao()).append("\n");
+            mensagemErro.append(produto.getCodBarras())
+                        .append(" - ")
+                        .append(produto.getDescricao())
+                        .append("\n");
         }
 
         if (primeiraContagem == listaParaConferir) {
@@ -260,7 +264,6 @@ public class ConferenciaController implements Initializable {
         }
     }
 
-
     private void mostrarAlerta(String title, String header, String content, boolean sucesso) {
         Alert alert = sucesso ? new Alert(AlertType.CONFIRMATION) : new Alert(AlertType.WARNING);
         alert.setTitle(title);
@@ -293,14 +296,6 @@ public class ConferenciaController implements Initializable {
         txtQuantidade.setOnKeyPressed(event -> {
             if (event.getCode().toString().equals("ENTER")) {
                 btnExecutar.requestFocus();
-            }
-        });
-    }
-
-    public void Troca3(){
-        btnExecutar.setOnKeyPressed(event -> {
-            if (event.getCode().toString().equals("ENTER")) {
-                txtCodBarra.requestFocus();
             }
         });
     }
