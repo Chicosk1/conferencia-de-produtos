@@ -179,25 +179,6 @@ public class ConferenciaController implements Initializable {
             }
         }
 
-        if (inventarioConcluidoComSucesso) {
-            mostrarAlerta("Sucesso", "Inventário Concluído", "O inventário foi concluído com sucesso!", true);
-        } else {
-            if (numeroDeContagens < 3) {
-                // Mensagem de erro padrão nas duas primeiras tentativas
-                mostrarAlerta("Erro", "Inventário Incompleto", "Alguns produtos possuem quantidade incorreta ou não foram conferidos. Faça uma nova contagem.", false);
-            } else {
-                // Na terceira tentativa, exibe a lista dos produtos divergentes e encerra o inventário
-                StringBuilder mensagemErro = new StringBuilder("Os seguintes produtos possuem divergências:\n");
-
-                for (Produto produto : produtosDivergentes) {
-                    mensagemErro.append("- ").append(produto.getDescricao()).append("\n");
-                }
-
-                mostrarAlerta("Erro", "Inventário Finalizado com Divergências", mensagemErro.toString(), false);
-                System.exit(0);
-            }
-        }
-
         listaConferencia.getItems().clear();
         listaParaConferir = new ArrayList<>(listaDeProdutos);
         contagens.clear();
@@ -223,40 +204,43 @@ public class ConferenciaController implements Initializable {
         StringBuilder mensagemErro = new StringBuilder("Os seguintes produtos possuem divergências:\n");
 
         for (Produto produto : produtosDivergentes) {
-            mensagemErro.append("- ").append(produto.getDescricao()).append("\n");
+            mensagemErro.append("- Descrição: ")
+                    .append(produto.getDescricao())
+                    .append("- Saldo Total: ")
+                    .append(produto.getSaldo())
+                    .append("\n");
         }
-
-        if (primeiraContagem == listaParaConferir) {
-            mostrarAlerta("Sucesso", "Inventário Concluído", "O inventário foi concluído com sucesso!", true);
-            System.exit(0);
-        } else {
-            mostrarAlerta("Erro", "Inventário Incompleto", "Alguns produtos possuem quantidade incorreta ou não foram conferidos. Iniciando Proxima conferencia (2)", false);
-
-        }if (numeroDeContagens == 2) {
-            if (segundaContagem != primeiraContagem) {
-                if (segundaContagem == listaParaConferir) {
+        if (numeroDeContagens == 1){
+            if (primeiraContagem == listaDeProdutos) {
+                mostrarAlerta("Sucesso", "Inventário Concluído", "O inventário foi concluído com sucesso!", true);
+                System.exit(0);
+            } else {
+                mostrarAlerta("Erro", "Inventário Incompleto", "Alguns produtos possuem quantidade incorreta ou não foram conferidos. Iniciando Proxima conferencia (2)", false);
+            }
+        }
+        if (numeroDeContagens == 2) {
+            if (segundaContagem == listaDeProdutos) {
+                mostrarAlerta("Sucesso", "Inventário Concluído", "O inventário foi concluído com sucesso!", true);
+                System.exit(0);
+            } else if (segundaContagem == primeiraContagem) {
                     mostrarAlerta("Erro", "Divergencia", "Segunda Contagem Exatamente Igual a primeira... Encerrando com Divergencias.", false);
                     mostrarAlerta("Erro", "Inventário Finalizado com Divergências", mensagemErro.toString(), false);
                     System.exit(0);
-                }else{
+                } else {
                     mostrarAlerta("Erro", "Inventário Incompleto", "Alguns produtos possuem quantidade incorreta ou não foram conferidos. Iniciando Proxima conferencia (3)", false);
-                    numeroDeContagens = 2;
-                }
-            }else{
-                mostrarAlerta("Sucesso", "Inventário Concluído", "O inventário foi concluído com sucesso!", true);
-                System.exit(0);
-            }if (numeroDeContagens == 3){
-                if (segundaContagem != listaParaConferir && segundaContagem != primeiraContagem) {
-                    if (terceiraContagem == listaParaConferir) {
-                        mostrarAlerta("Sucesso", "Inventário Concluído", "O inventário foi concluído com sucesso!", true);
-                        System.exit(0);
-                    } else {
-                        mostrarAlerta("Erro", "Inventário Finalizado com Divergências", mensagemErro.toString(), false);
-                        System.exit(0);
-                    }
                 }
             }
 
+        if (numeroDeContagens == 3){
+            if (segundaContagem != listaDeProdutos && segundaContagem != primeiraContagem) {
+                if (terceiraContagem == listaDeProdutos) {
+                    mostrarAlerta("Sucesso", "Inventário Concluído", "O inventário foi concluído com sucesso!", true);
+                    System.exit(0);
+                } else {
+                    mostrarAlerta("Erro", "Inventário Finalizado com Divergências", mensagemErro.toString(), false);
+                    System.exit(0);
+                }
+            }
         }
     }
 
