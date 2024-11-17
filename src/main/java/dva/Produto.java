@@ -29,13 +29,4 @@ public class Produto {
         return saldo;
     }
 
-    @Override
-    public String toString() {
-        return "Produto{" +
-                "codBarras='" + codBarras + '\'' +
-                ", nomeProduto='" + nomeProduto + '\'' +
-                ", saldo=" + saldo +
-                ", valor=" + valor +
-                '}';
-    }
 }
