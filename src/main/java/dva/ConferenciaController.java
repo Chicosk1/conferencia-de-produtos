@@ -27,16 +27,16 @@ public class ConferenciaController implements Initializable {
 
     private List<Produto> listaDeProdutos = new ArrayList<>();
 
-    private int numeroDeContagens = 0; // Contador para rastrear quantas contagens foram realizadas
+    private int numeroDeContagens = 0;
 
 
     public ConferenciaController() {
 
         listaDeProdutos.add(new Produto("1", "SAPATO", 20.99, 1));
         listaDeProdutos.add(new Produto("2", "CHINELOS", 19.99, 2));
-        listaDeProdutos.add(new Produto("3", "CHINELOS", 19.99, 3));
-        listaDeProdutos.add(new Produto("4", "CHINELOS", 19.99, 4));
-        listaDeProdutos.add(new Produto("5", "CHINELOS", 19.99, 5));
+        listaDeProdutos.add(new Produto("3", "TENIS", 19.99, 3));
+        listaDeProdutos.add(new Produto("4", "COMPUTADOR", 19.99, 4));
+        listaDeProdutos.add(new Produto("5", "MOUSE", 19.99, 5));
 
     }
 
@@ -102,13 +102,13 @@ public class ConferenciaController implements Initializable {
 
                 if (primeiraContagem.stream().noneMatch(p -> p.getCodBarras().equals(codBarrasConferencia))) {
                     primeiraContagem.add(produtoConferido);
-                    numeroDeContagens = 1; // Atualiza para indicar que a primeira contagem foi realizada
+                    numeroDeContagens = 1;
                 } else if (segundaContagem.stream().noneMatch(p -> p.getCodBarras().equals(codBarrasConferencia))) {
                     segundaContagem.add(produtoConferido);
-                    numeroDeContagens = 2; // Atualiza para indicar que a segunda contagem foi realizada
+                    numeroDeContagens = 2;
                 } else if (terceiraContagem.stream().noneMatch(p -> p.getCodBarras().equals(codBarrasConferencia))) {
                     terceiraContagem.add(produtoConferido);
-                    numeroDeContagens = 3; // Atualiza para indicar que a terceira contagem foi realizada
+                    numeroDeContagens = 3;
                 }
 
                 contagens.add(new ArrayList<>(List.of(produtoConferido)));
@@ -181,22 +181,6 @@ public class ConferenciaController implements Initializable {
 
         if (inventarioConcluidoComSucesso) {
             mostrarAlerta("Sucesso", "Inventário Concluído", "O inventário foi concluído com sucesso!", true);
-        } else {
-            if (numeroDeContagens < 3) {
-                mostrarAlerta("Erro", "Inventário Incompleto", "Alguns produtos possuem quantidade incorreta ou não foram conferidos. Faça uma nova contagem.", false);
-            } else {
-                StringBuilder mensagemErro = new StringBuilder("Os seguintes produtos possuem divergências:\n");
-
-                for (Produto produto : produtosDivergentes) {
-                    mensagemErro.append(produto.getCodBarras())
-                            .append(" - ")
-                            .append(produto.getDescricao())
-                            .append("\n");
-                }
-
-                mostrarAlerta("Erro", "Inventário Finalizado com Divergências", mensagemErro.toString(), false);
-                System.exit(0);
-            }
         }
 
         listaConferencia.getItems().clear();
@@ -231,38 +215,27 @@ public class ConferenciaController implements Initializable {
         }
 
         if (primeiraContagem == listaParaConferir) {
-            mostrarAlerta("Sucesso", "Inventário Concluído", "O inventário foi concluído com sucesso!", true);
+            mostrarAlerta("Sucesso", "Inventário Concluído", "O inventário foi concluído com sucesso na primeira conferência!", true);
+            System.exit(0);
+        } else if (primeiraContagem != listaParaConferir && numeroDeContagens == 1) {
+            mostrarAlerta("Divergência", "Inventário Incompleto", "Alguns produtos possuem quantidade incorreta. Iniciando segunda conferência", false);
+        } else if (segundaContagem == listaParaConferir && numeroDeContagens == 2) {
+            mostrarAlerta("Sucesso", "Inventário Concluído", "O inventário foi concluído com sucesso na segunda conferência!", true);
+            System.exit(0);
+        } else if (segundaContagem != listaParaConferir && numeroDeContagens == 2) {
+            mostrarAlerta("Divergência", "Inventário Incompleto", "Alguns produtos possuem quantidade incorreta. Iniciando terceira conferência", false);
+        } else if ((segundaContagem != listaParaConferir && segundaContagem == primeiraContagem) && numeroDeContagens == 2) {
+            mostrarAlerta("Divergência", "Inventário Finalizado com Divergências (Segunda Contagem igual a Primeira)", mensagemErro.toString(), false);
+            System.exit(0);
+        }else if (terceiraContagem == listaParaConferir && numeroDeContagens == 3) {
+            mostrarAlerta("Sucesso", "Inventário Concluído", "O inventário foi concluído com sucesso na terceira conferência!", true);
             System.exit(0);
         } else {
-            mostrarAlerta("Erro", "Inventário Incompleto", "Alguns produtos possuem quantidade incorreta ou não foram conferidos. Iniciando Proxima conferencia (2)", false);
-
-        }if (numeroDeContagens == 2) {
-            if (segundaContagem != primeiraContagem) {
-                if (segundaContagem == listaParaConferir) {
-                    mostrarAlerta("Erro", "Divergencia", "Segunda Contagem Exatamente Igual a primeira... Encerrando com Divergencias.", false);
-                    mostrarAlerta("Erro", "Inventário Finalizado com Divergências", mensagemErro.toString(), false);
-                    System.exit(0);
-                }else{
-                    mostrarAlerta("Erro", "Inventário Incompleto", "Alguns produtos possuem quantidade incorreta ou não foram conferidos. Iniciando Proxima conferencia (3)", false);
-                    numeroDeContagens = 2;
-                }
-            }else{
-                mostrarAlerta("Sucesso", "Inventário Concluído", "O inventário foi concluído com sucesso!", true);
-                System.exit(0);
-            }if (numeroDeContagens == 3){
-                if (segundaContagem != listaParaConferir && segundaContagem != primeiraContagem) {
-                    if (terceiraContagem == listaParaConferir) {
-                        mostrarAlerta("Sucesso", "Inventário Concluído", "O inventário foi concluído com sucesso!", true);
-                        System.exit(0);
-                    } else {
-                        mostrarAlerta("Erro", "Inventário Finalizado com Divergências", mensagemErro.toString(), false);
-                        System.exit(0);
-                    }
-                }
-            }
-
+            mostrarAlerta("Divergência", "Inventário Finalizado com Divergências", mensagemErro.toString(), false);
+            System.exit(0);
         }
     }
+
 
     private void mostrarAlerta(String title, String header, String content, boolean sucesso) {
         Alert alert = sucesso ? new Alert(AlertType.CONFIRMATION) : new Alert(AlertType.WARNING);
