@@ -49,8 +49,10 @@ public class ConferenciaController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        //Chamando metodo adicionarItem ao pressionar botão
         btnExecutar.setOnAction(event -> adicionarItem());
 
+        //Inserindo cor no String do Produto com validação de saldo
         listaConferencia.setCellFactory(param -> new ListCell<String>() {
             @Override
             protected void updateItem(String item, boolean empty) {
@@ -60,8 +62,6 @@ public class ConferenciaController implements Initializable {
                         setStyle("-fx-text-fill: red;");
                     } else if (item.contains("(Saldo disponível)")) {
                         setStyle("-fx-text-fill: blue;");
-                    } else {
-                        setStyle("");
                     }
                     setText(item);
                 } else {
@@ -75,7 +75,7 @@ public class ConferenciaController implements Initializable {
     public void adicionarItem() {
         String codBarrasConferencia = txtCodBarra.getText().trim();
         String quantidadeConferencia = txtQuantidade.getText().trim();
-
+                                                                            //Regex de numerais
         if (quantidadeConferencia.isEmpty() || !quantidadeConferencia.matches("\\d+")) {
             mostrarAlerta("Erro", "Quantidade Inválida", "A quantidade informada não é válida.", false);
             return;
@@ -84,7 +84,9 @@ public class ConferenciaController implements Initializable {
         int quantidade = Integer.parseInt(quantidadeConferencia);
         boolean produtoEncontrado = false;
 
+        // Passando por toda a lista
         for (Produto produto : listaParaConferir) {
+            //Verificando se o codigo de barras inserido é igual ao da lista de produtos
             if (produto.getCodBarras().equals(codBarrasConferencia)) {
                 String descricao = produto.getDescricao();
                 double valor = produto.getValor();
@@ -96,11 +98,13 @@ public class ConferenciaController implements Initializable {
                     item += " (Saldo disponível)";
                 }
 
+                //Atualiza o item se possuir o código de barras igual
                 listaConferencia.getItems().removeIf(i -> i.contains("Código: " + codBarrasConferencia));
                 listaConferencia.getItems().add(item);
 
                 Produto produtoConferido = new Produto(codBarrasConferencia, descricao, valor, quantidade);
 
+                //Lista para conferir -> filtrar -> verifica os correspondentes -> verificando se o produto é o mesmo da conferencia
                 if (primeiraContagem.stream().noneMatch(p -> p.getCodBarras().equals(codBarrasConferencia))) {
                     primeiraContagem.add(produtoConferido);
                     numeroDeContagens = 1;
@@ -156,7 +160,7 @@ public class ConferenciaController implements Initializable {
 
         for (Produto produto : listaParaConferir) {
             double quantidadeRegistrada = produto.getSaldo();
-            boolean produtoConferidoNaPrimeira = false;
+            boolean produtoConferido = false;
 
             for (List<Produto> conferencias : contagens) {
                 for (Produto conferido : conferencias) {
@@ -166,14 +170,14 @@ public class ConferenciaController implements Initializable {
                             produtosDivergentes.add(conferido);
                             inventarioConcluidoComSucesso = false;
                         }
-                        produtoConferidoNaPrimeira = true;
+                        produtoConferido = true;
                         break;
                     }
                 }
-                if (produtoConferidoNaPrimeira) break;
+                if (produtoConferido) break;
             }
 
-            if (!produtoConferidoNaPrimeira) {
+            if (!produtoConferido) {
                 inventarioConcluidoComSucesso = false;
                 produtosDivergentes.add(produto);
             }
@@ -184,11 +188,13 @@ public class ConferenciaController implements Initializable {
             System.exit(0);
         }
 
+        //Limpa o ListView
         listaConferencia.getItems().clear();
         listaParaConferir = new ArrayList<>(listaDeProdutos);
         contagens.clear();
         listaConferencia.refresh();
 
+        //Validações das mensagens
         if (!inventarioConcluidoComSucesso) {
             if (numeroDeContagens == 1) {
                 verificarDivergencias(primeiraContagem);
@@ -206,22 +212,27 @@ public class ConferenciaController implements Initializable {
 
     }
 
+    //Formulador de mensagem
     private void verificarDivergencias(List<Produto> contagem) {
 
         StringBuilder mensagemErro = new StringBuilder("Os seguintes produtos possuem divergências:\n");
 
         for (Produto produto : produtosDivergentes) {
+                        //adicionar
             mensagemErro.append(produto.getCodBarras())
-                    .append(" - ")
-                    .append(produto.getDescricao())
-                    .append("\n");
+                        .append(" - ")
+                        .append(produto.getDescricao())
+                                //nova linha
+                        .append("\n");
         }
 
+        //Verificações para mensagens
         if (!primeiraContagem.equals(listaParaConferir) && numeroDeContagens == 1) {
             mostrarAlerta("Divergência", "Inventário Incompleto", "Alguns produtos possuem quantidade incorreta. Iniciando segunda conferência", false);
         } else if (segundaContagem.equals(listaParaConferir) && numeroDeContagens == 2) {
             mostrarAlerta("Sucesso", "Inventário Concluído", "O inventário foi concluído com sucesso na segunda conferência!", true);
             System.exit(0);
+                                            //Lista -> filtragem -> verifica se é compativel -> segunda lista -> filtragem -> verifica se é compatível -> p1 == p2
         } else if (numeroDeContagens == 2 && primeiraContagem.stream().allMatch(p1 -> segundaContagem.stream().anyMatch(p2 ->
                                              p1.getCodBarras().equals(p2.getCodBarras()) && p1.getSaldo() == p2.getSaldo()))) {
             mostrarAlerta("Divergência", "Inventário Finalizado com Divergências (Segunda Contagem igual a Primeira)", mensagemErro.toString(), false);
